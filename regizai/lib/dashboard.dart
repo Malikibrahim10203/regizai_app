@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:regizai/artikel.dart';
 import 'package:regizai/calculate.dart';
 
 class Dashboard extends StatefulWidget {
@@ -255,25 +256,31 @@ class _DashboardState extends State<Dashboard> {
                               return Container(
                                   width: MediaQuery.of(context).size.width,
                                   margin: EdgeInsets.symmetric(horizontal: 5.0),
-                                  child: Column(
-                                    children: [
-                                      Image.asset(
-                                        "$i",
-                                        width: MediaQuery.of(context).size.width*1,
-                                        height: MediaQuery.of(context).size.height*0.2,
-                                        fit: BoxFit.cover,
-                                      ),
-                                      SizedBox(
-                                        height: 5,
-                                      ),
-                                      Row(
-                                        children: [
-                                          Text(
-                                              "Tips diet sehat"
-                                          ),
-                                        ],
-                                      )
-                                    ],
+                                  child: ElevatedButton(
+                                    onPressed: () {
+                                      // Untuk pindH ketika di klik
+                                      Navigator.push(context, MaterialPageRoute(builder: (context)=>Artikel()));
+                                    },
+                                    child: Column(
+                                      children: [
+                                        Image.asset(
+                                          "$i",
+                                          width: MediaQuery.of(context).size.width*1,
+                                          height: MediaQuery.of(context).size.height*0.2,
+                                          fit: BoxFit.cover,
+                                        ),
+                                        SizedBox(
+                                          height: 5,
+                                        ),
+                                        Row(
+                                          children: [
+                                            Text(
+                                                "Tips diet sehat"
+                                            ),
+                                          ],
+                                        )
+                                      ],
+                                    ),
                                   )
                               );
                             },
