@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:regizai/artikel.dart';
+import 'package:regizai/artikel2.dart';
+import 'package:regizai/artikel3.dart';
 import 'package:regizai/calculate.dart';
 
 class Dashboard extends StatefulWidget {
@@ -259,7 +261,7 @@ class _DashboardState extends State<Dashboard> {
                                   child: ElevatedButton(
                                     onPressed: () {
                                       // Untuk pindH ketika di klik
-                                      Navigator.push(context, MaterialPageRoute(builder: (context)=>Artikel()));
+                                      Navigator.push(context, MaterialPageRoute(builder: (context)=>DetailFood()));
                                     },
                                     child: Column(
                                       children: [
