@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 class Artikel extends StatefulWidget {
   const Artikel({Key? key}) : super(key: key);
 
@@ -9,6 +10,7 @@ class Artikel extends StatefulWidget {
 }
 
 class _ArtikelState extends State<Artikel> {
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -166,6 +168,23 @@ class _ArtikelState extends State<Artikel> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
+                  ],
+                ),
+                SizedBox(
+                  height: 20,
+                ),
+                Row(
+                  children: [
+                    YoutubePlayer(
+                      width: 200,
+                      controller: YoutubePlayerController(
+                          initialVideoId: 'ejYfIDTIBb8',
+                          flags: YoutubePlayerFlags(
+                              autoPlay: true,
+                              mute: false
+                          )
+                      ),
+                    )
                   ],
                 ),
               ],
