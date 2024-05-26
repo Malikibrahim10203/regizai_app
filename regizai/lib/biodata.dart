@@ -1,19 +1,41 @@
 import 'package:flutter/material.dart';
+import 'package:regizai/event/event_db.dart';
 
 class Biodata extends StatefulWidget {
-  const Biodata({Key? key}) : super(key: key);
+  Biodata({super.key, required this.email, required this.password, required this.gender});
+
+  final String email;
+  final String password;
+  final String gender;
 
   @override
   State<Biodata> createState() => _BiodataState();
 }
 
 class _BiodataState extends State<Biodata> {
+
+  var formKey = GlobalKey<FormState>();
+
+  var birth;
+  var controllerName = TextEditingController();
+  var controllerWidth = TextEditingController();
+  var controllerHeight = TextEditingController();
+
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    birth;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         body: ListView(
           children: [
             Form(
+              key: formKey,
               child: Padding(
                 padding: EdgeInsets.all(30),
                 child: Column(
@@ -52,6 +74,7 @@ class _BiodataState extends State<Biodata> {
                       width: 350,
                       height: 50,
                       child: TextFormField(
+                        controller: controllerName,
                         decoration: InputDecoration(
                             labelText: "Name",
                             border: OutlineInputBorder(
@@ -71,17 +94,23 @@ class _BiodataState extends State<Biodata> {
                           height: 50,
                           child: TextFormField(
                             decoration: InputDecoration(
-                                labelText: "Select your birth",
-                                border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10)
-                                )
+                              enabled: false,
+                              labelText: "Select your birth",
+                              border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10)
+                              ),
                             ),
                           ),
                         ),
                         SizedBox(
-                          width: 55,
+                          width: 65,
                           height: 50,
                           child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(5)
+                              )
+                            ),
                             onPressed: () async {
                               DateTime date = DateTime.now();
                               DateTime? newDate = await showDatePicker(
@@ -90,9 +119,13 @@ class _BiodataState extends State<Biodata> {
                                 firstDate: DateTime(1900),
                                 lastDate: DateTime(2100),
                               );
+                              setState(() {
+                                birth = newDate.toString();
+                              });
                             },
                             child: Icon(
-                                Icons.calendar_month
+                              Icons.calendar_month,
+                              size: 20,
                             ),
                           ),
                         ),
@@ -105,8 +138,10 @@ class _BiodataState extends State<Biodata> {
                       width: 350,
                       height: 50,
                       child: TextFormField(
+                        controller: controllerWidth,
+                        keyboardType: TextInputType.number,
                         decoration: InputDecoration(
-                            labelText: "Width",
+                            labelText: "Width-Kg",
                             suffixIcon: Icon(Icons.keyboard_arrow_left),
                             border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10)
@@ -121,8 +156,9 @@ class _BiodataState extends State<Biodata> {
                       width: 350,
                       height: 50,
                       child: TextFormField(
+                        controller: controllerHeight,
                         decoration: InputDecoration(
-                            labelText: "Height",
+                            labelText: "Height-Cm",
                             suffixIcon: Icon(Icons.keyboard_arrow_up_sharp),
                             border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10)
@@ -137,14 +173,19 @@ class _BiodataState extends State<Biodata> {
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         SizedBox(
-                          width: 100,
-                          height: 30,
+                          width: 350,
+                          height: 50,
                           child: ElevatedButton(
                               style: ElevatedButton.styleFrom(
-                                  backgroundColor: Color(0xff734597)
+                                  backgroundColor: Color(0xff734597),
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10)
+                                  )
                               ),
-                              onPressed: (){},
-                              child: Text("Finish")
+                              onPressed: (){
+                                EventDB.addUser(controllerName.text, widget.email, widget.password, widget.gender, birth, controllerWidth.text, controllerHeight.text);
+                              },
+                              child: Text("Finish", style: TextStyle(color: Colors.white),)
                           ),
                         ),
                       ],

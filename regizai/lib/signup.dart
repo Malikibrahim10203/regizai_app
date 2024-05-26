@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:regizai/gender_page.dart';
+import 'package:regizai/login.dart';
 
 class Signup extends StatelessWidget {
-  const Signup({Key? key}) : super(key: key);
+
+  var controllerEmail = TextEditingController();
+  var controllerPassword = TextEditingController();
+  var formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
@@ -33,6 +38,7 @@ class Signup extends StatelessWidget {
                     height: 20,
                   ),
                   Form(
+                    key: formKey,
                     child: Column(
                       children: [
                         Row(
@@ -57,6 +63,7 @@ class Signup extends StatelessWidget {
                           width: 330,
                           height: 50,
                           child: TextFormField(
+                            controller: controllerEmail,
                             decoration: InputDecoration(
                                 labelText: "Email",
                                 prefixIcon: Icon(Icons.email),
@@ -73,6 +80,8 @@ class Signup extends StatelessWidget {
                           width: 330,
                           height: 50,
                           child: TextFormField(
+                            controller: controllerPassword,
+                            obscureText: true,
                             decoration: InputDecoration(
                               labelText: "Password",
                               prefixIcon: Icon(Icons.fingerprint),
@@ -86,15 +95,26 @@ class Signup extends StatelessWidget {
                           height: 20,
                         ),
                         SizedBox(
-                          width: 100,
-                          height: 30,
+                          width: 330,
+                          height: 50,
                           child: ElevatedButton(
                               style: ElevatedButton.styleFrom(
-                                  backgroundColor: Color(0xff734597)
+                                  backgroundColor: Color(0xff734597),
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10)
+                                  )
                               ),
-                              onPressed: (){},
+                              onPressed: (){
+                                Navigator.push(context, MaterialPageRoute(builder: (context)=>GenderPage(email: controllerEmail.text, password: controllerPassword.text)));
+                              },
                               child: Text("Create", style: TextStyle(color: Colors.white))
                           ),
+                        ),
+                        TextButton(
+                            onPressed: (){
+                              Navigator.push(context, MaterialPageRoute(builder: (context)=>Login()));
+                            },
+                            child: Text("Already have account?")
                         ),
                       ],
                     ),

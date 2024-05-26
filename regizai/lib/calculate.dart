@@ -1,4 +1,7 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:regizai/api/bmi_service.dart';
 import 'package:wave/wave.dart';
 
 class Calculate extends StatefulWidget {
@@ -9,6 +12,29 @@ class Calculate extends StatefulWidget {
 }
 
 class _CalculateState extends State<Calculate> {
+
+
+  final _weightController = TextEditingController();
+  final _heightController = TextEditingController();
+  final _bmiService = BmiService();
+  String _bmiResult = '';
+
+  void _calculateBmi() async {
+    double weight = double.parse(_weightController.text);
+    double height = double.parse(_heightController.text);
+
+    try {
+      var result = await _bmiService.calculateBmi(weight, height);
+      setState(() {
+        _bmiResult = result['bmi'].toString();
+      });
+    } catch (e) {
+      setState(() {
+        _bmiResult = 'Error: ${e.toString()}';
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -36,6 +62,7 @@ class _CalculateState extends State<Calculate> {
                               width: MediaQuery.of(context).size.width * 0.6,
                               height: MediaQuery.of(context).size.height * 0.08,
                               child: TextFormField(
+                                controller: _weightController,
                                 decoration: InputDecoration(
                                   labelText: "Weight",
                                   border: OutlineInputBorder(
@@ -45,9 +72,16 @@ class _CalculateState extends State<Calculate> {
                               ),
                             ),
                             SizedBox(
-                              width: MediaQuery.of(context).size.width * 0.2,
+                              width: 10,
+                            ),
+                            Container(
+                              width: MediaQuery.of(context).size.width * 0.15,
                               height: MediaQuery.of(context).size.height * 0.08,
-                              child: Icon(Icons.monitor_weight_outlined),
+                              decoration: BoxDecoration(
+                                border: Border.all(width: 1, color: Colors.black54),
+                                borderRadius: BorderRadius.circular(10)
+                              ),
+                              child: Icon(Icons.monitor_weight_outlined, color: Colors.black54,),
                             ),
                           ],
                         ),
@@ -60,6 +94,7 @@ class _CalculateState extends State<Calculate> {
                               width: MediaQuery.of(context).size.width * 0.6,
                               height: MediaQuery.of(context).size.height * 0.08,
                               child: TextFormField(
+                                controller: _heightController,
                                 decoration: InputDecoration(
                                   labelText: "Height",
                                   border: OutlineInputBorder(
@@ -69,9 +104,16 @@ class _CalculateState extends State<Calculate> {
                               ),
                             ),
                             SizedBox(
-                              width: MediaQuery.of(context).size.width * 0.2,
+                              width: 10,
+                            ),
+                            Container(
+                              width: MediaQuery.of(context).size.width * 0.15,
                               height: MediaQuery.of(context).size.height * 0.08,
-                              child: Icon(Icons.height),
+                              decoration: BoxDecoration(
+                                  border: Border.all(width: 1, color: Colors.black54),
+                                  borderRadius: BorderRadius.circular(10)
+                              ),
+                              child: Icon(Icons.height, color: Colors.black54,),
                             ),
                           ],
                         ),
@@ -90,7 +132,9 @@ class _CalculateState extends State<Calculate> {
                                     ),
                                   backgroundColor: Color(0xff734597)
                                 ),
-                                onPressed: () {},
+                                onPressed: () {
+                                  _calculateBmi();
+                                },
                                 child: Text("Calculate", style: TextStyle(color: Colors.white),),
                               ),
                             ),
@@ -100,16 +144,16 @@ class _CalculateState extends State<Calculate> {
                     ),
                   ),
                 ),
-                SizedBox(
-                  width: MediaQuery.of(context).size.width*1,
-                  height: MediaQuery.of(context).size.height*0.5,
-                  child: Container(
-                    decoration: BoxDecoration(
-                        image: DecorationImage(
-                            image: AssetImage("assets/img/artikel1.png"),
-                            fit: BoxFit.cover
-                        )
-                    ),
+                Container(
+                  width: MediaQuery.of(context).size.width * 0.9,
+                  height: MediaQuery.of(context).size.height * 0.3,
+                  decoration: BoxDecoration(
+                    border: Border.all(width: 1, color: Colors.black38),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Padding(
+                    padding: EdgeInsets.all(10),
+                    child: Text("BMI Result: $_bmiResult"),
                   ),
                 )
               ],
