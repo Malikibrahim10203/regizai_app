@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:regizai/biodata.dart';
+import 'package:regizai/pages/biodata.dart';
 
 class GenderPage extends StatefulWidget {
   const GenderPage({super.key, required this.email, required this.password});

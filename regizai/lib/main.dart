@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:get/get_navigation/get_navigation.dart';
-import 'package:regizai/dashboard.dart';
+import 'package:regizai/pages/dashboard.dart';
 import 'package:regizai/event/event_pref.dart';
 import 'package:regizai/login.dart';
 import 'package:regizai/model/user.dart';
 import 'signup.dart';
-import 'gender_page.dart';
-import 'biodata.dart';
+
 
 void main() {
   runApp(const MyApp());

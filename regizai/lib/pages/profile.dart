@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:regizai/event/event_pref.dart';
+import 'package:regizai/pages/edit_profile.dart';
 
 class Profile extends StatefulWidget {
   const Profile({Key? key}) : super(key: key);
@@ -10,14 +11,22 @@ class Profile extends StatefulWidget {
 
 class _ProfileState extends State<Profile> {
 
+  late String userId;
   late String userName;
   late String userWidth;
   late String userHeight;
+  
+  var BBI;
+  var calories;
 
   void getUser() async {
+    userId = (await EventPref.getUser())?.id ?? "";
     userName = (await EventPref.getUser())?.name ?? "";
     userWidth = (await EventPref.getUser())?.width ?? "";
     userHeight = (await EventPref.getUser())?.height ?? "";
+
+    BBI = (int.parse(userHeight)-100) - (0.1*(int.parse(userHeight)-100));
+    calories = 30*BBI;
 
     setState(() {
 
@@ -27,6 +36,7 @@ class _ProfileState extends State<Profile> {
   @override
   void initState() {
     // TODO: implement initState
+
     getUser();
     super.initState();
   }
@@ -45,37 +55,48 @@ class _ProfileState extends State<Profile> {
             Column(
               children: [
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Container(
-                      width: 100,
-                      height: 100,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(100),
-                        border: Border.all(
-                            width: 1,
-                            color: Colors.black38
-                        ),
-                      ),
-                      child: Image.asset("assets/img/male.png", ),
-                    ),
-                    SizedBox(
-                      width: 20,
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    Row(
                       children: [
-                        Row(
+                        Container(
+                          width: 100,
+                          height: 100,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(100),
+                            border: Border.all(
+                                width: 1,
+                                color: Colors.black38
+                            ),
+                          ),
+                          child: Image.asset("assets/img/male.png", ),
+                        ),
+                        SizedBox(
+                          width: 30,
+                        ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text("$userName", style: TextStyle(fontSize: 25, fontWeight: FontWeight.w500),)
+                            Row(
+                              children: [
+                                Text("$userName", style: TextStyle(fontSize: 25, fontWeight: FontWeight.w500),)
+                              ],
+                            ),
+                            Row(
+                              children: [
+                                Text("Profile")
+                              ],
+                            )
                           ],
                         ),
-                        Row(
-                          children: [
-                            Text("Profile")
-                          ],
-                        )
                       ],
-                    )
+                    ),
+                    IconButton(
+                      onPressed: (){
+                        Navigator.push(context, MaterialPageRoute(builder: (context)=>EditProfile(id: userId, name: userName, width: userWidth, height: userHeight,)));
+                      },
+                      icon: Icon(Icons.more_vert),
+                    ),
                   ],
                 ),
                 SizedBox(
@@ -216,7 +237,7 @@ class _ProfileState extends State<Profile> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text("Kalori Harian"),
-                                Text("2000 Kcal")
+                                Text("$calories Kcal")
                               ],
                             )
                           ],

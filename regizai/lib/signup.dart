@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:regizai/gender_page.dart';
+import 'package:regizai/pages/gender_page.dart';
 import 'package:regizai/login.dart';
 
 class Signup extends StatelessWidget {

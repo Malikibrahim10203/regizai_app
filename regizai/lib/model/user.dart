@@ -6,8 +6,8 @@ class User {
   String? email;
   String? emailVerifiedAt;
   String? password;
-  String? birth;
   String? gender;
+  String? birth;
   String? width;
   String? height;
   String? rememberToken;
@@ -20,8 +20,8 @@ class User {
     required this.email,
     required this.emailVerifiedAt,
     required this.password,
-    required this.birth,
     required this.gender,
+    required this.birth,
     required this.width,
     required this.height,
     required this.rememberToken,

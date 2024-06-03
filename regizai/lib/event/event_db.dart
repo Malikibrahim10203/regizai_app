@@ -7,7 +7,8 @@ import 'package:regizai/login.dart';
 import 'package:regizai/model/catatan_harian.dart';
 import 'package:regizai/model/user.dart';
 import 'package:get/get.dart';
-import 'package:regizai/dashboard.dart';
+import 'package:regizai/pages/dashboard.dart';
+import 'package:regizai/pages/profile.dart';
 
 
 class EventDB {
@@ -93,4 +94,55 @@ class EventDB {
     }
     return listUser;
   }
+
+  static Future<User?> editUser( String id,String name, String oldPassword, String newPassword, String width, String height) async {
+
+    try {
+      var response = await http.post(Uri.parse(Api.editUser), body: {
+        'id': id,
+        'oldPassword': oldPassword,
+        'newPassword': newPassword,
+        'name': name,
+        'width': width,
+        'height': height,
+      });
+
+      if (response.statusCode == 200) {
+        Future.delayed(Duration(milliseconds: 1700), () {
+          Get.off(
+            Profile(),
+          );
+        });
+      } else {
+
+      }
+
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  static Future<List<User>> getUser(String id) async {
+    List<User> listUser = [];
+
+    try {
+      var response = await http.post(Uri.parse(Api.getCatatan), body: {
+        "id": id
+      });
+
+      if (response.statusCode == 200) {
+        var responseBody = jsonDecode(response.body);
+        if (responseBody['success']) {
+          var users = responseBody['user'];
+          users.forEach((user) {
+            listUser.add(User.fromJson(user));
+          });
+        }
+      }
+    } catch (e) {
+      print(e);
+    }
+    return listUser;
+  }
+
 }

@@ -1,12 +1,18 @@
+import 'package:camera/camera.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:regizai/artikel.dart';
-import 'package:regizai/calculate.dart';
-import 'package:regizai/catatan.dart';
+import 'package:regizai/camera/camera.dart';
+import 'package:regizai/event/event_db.dart';
+import 'package:regizai/model/user.dart';
+import 'package:regizai/pages/artikel.dart';
+import 'package:regizai/pages/book.dart';
+import 'package:regizai/pages/calculate.dart';
+import 'package:regizai/pages/catatan.dart';
 import 'package:regizai/event/event_pref.dart';
 import 'package:regizai/login.dart';
-import 'package:regizai/profile.dart';
+import 'package:regizai/pages/profile.dart';
+import 'package:regizai/addon/card.dart';
 
 class Dashboard extends StatefulWidget {
   const Dashboard({Key? key}) : super(key: key);
@@ -18,6 +24,7 @@ class Dashboard extends StatefulWidget {
 class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
 
   late String userName;
+  List<User> listUser = [];
 
   TabController? _controller;
 
@@ -126,7 +133,9 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                                   width: 70,
                                   height: 70,
                                   child: ElevatedButton(
-                                    onPressed: () {},
+                                    onPressed: () async {
+                                      await availableCameras().then((value) => Navigator.push(context, MaterialPageRoute(builder: (_) => Camera(cameras: value))));
+                                    },
                                     style: ElevatedButton.styleFrom(
                                       shape: RoundedRectangleBorder(
                                           borderRadius: BorderRadius.circular(15),
@@ -188,7 +197,9 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                                   width: 70,
                                   height: 70,
                                   child: ElevatedButton(
-                                    onPressed: () {},
+                                    onPressed: () {
+                                      Navigator.push(context, MaterialPageRoute(builder: (context)=>Books()));
+                                    },
                                     style: ElevatedButton.styleFrom(
                                         shape: RoundedRectangleBorder(
                                             borderRadius: BorderRadius.circular(15)

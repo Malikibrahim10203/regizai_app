@@ -1,10 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:regizai/dashboard.dart';
+import 'package:regizai/pages/dashboard.dart';
 import 'package:regizai/event/event_db.dart';
 import 'package:regizai/event/event_pref.dart';
 import 'package:regizai/model/catatan_harian.dart';
-import 'package:regizai/profile.dart';
+import 'package:regizai/pages/profile.dart';
+import 'package:regizai/pages/result.dart';
 
 class Catatan extends StatefulWidget {
   // const Catatan({super.key, required this.id}));
@@ -64,19 +65,24 @@ class _CatatanState extends State<Catatan> with TickerProviderStateMixin {
                 itemCount: listCat.length,
                 itemBuilder: (context, index) {
                   CatatanModel catatans = listCat[index];
-                  return Container(
-                    width: MediaQuery.of(context).size.width * 0.7,
-                    height: MediaQuery.of(context).size.height * 0.15,
-                    child: Card(
-                      color: Colors.white,
-                      shadowColor: Colors.black,
-                      shape: Border(
-                        right: BorderSide(width: 5, color: Colors.black54)
-                      ),
-                      child: ListTile(
-                        title: Text("${catatans.namaMakanan}"),
-                        subtitle: Text("${catatans.calories}"),
-                        trailing: Text("${catatans.tglCapture}"),
+                  return GestureDetector(
+                    onTap: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (context)=>ResultFood(nameFood: "Bakso")));
+                    },
+                    child: Container(
+                      width: MediaQuery.of(context).size.width * 0.7,
+                      height: MediaQuery.of(context).size.height * 0.15,
+                      child: Card(
+                        color: Colors.white,
+                        shadowColor: Colors.black,
+                        shape: Border(
+                            right: BorderSide(width: 5, color: Colors.black54)
+                        ),
+                        child: ListTile(
+                          title: Text("${catatans.namaMakanan}"),
+                          subtitle: Text("${catatans.calories}"),
+                          trailing: Text("${catatans.tglCapture}"),
+                        ),
                       ),
                     ),
                   );
