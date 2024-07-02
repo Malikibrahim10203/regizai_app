@@ -11,6 +11,15 @@ class ResultFood extends StatefulWidget {
 
 class _ResultFoodState extends State<ResultFood> {
 
+  var name;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    name = widget.nameFood;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -28,7 +37,7 @@ class _ResultFoodState extends State<ResultFood> {
                   borderRadius: BorderRadius.circular(20), // Image border
                   child: SizedBox.fromSize(
                     child: Image.asset(
-                      'assets/img/bakso.png',
+                      'assets/img/$name.png',
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -50,7 +59,10 @@ class _ResultFoodState extends State<ResultFood> {
                 Row(
                     children: [
                       Text(
-                          '${widget.nameFood}'
+                        '${widget.nameFood}',
+                        style: TextStyle(
+                          fontSize: 10,
+                        ),
                       ),
                     ]
                 ),
@@ -139,6 +151,10 @@ class _ResultFoodState extends State<ResultFood> {
                 SizedBox(
                   height: 20,
                 ),
+                ElevatedButton(
+                  onPressed: () {},
+                  child: Text("Catat"),
+                )
               ],
             ),
           ),

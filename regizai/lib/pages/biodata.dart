@@ -90,7 +90,7 @@ class _BiodataState extends State<Biodata> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         SizedBox(
-                          width: 280,
+                          width: 260,
                           height: 50,
                           child: TextFormField(
                             decoration: InputDecoration(
@@ -170,10 +170,10 @@ class _BiodataState extends State<Biodata> {
                       height: MediaQuery.of(context).size.height * 0.2,
                     ),
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         SizedBox(
-                          width: 350,
+                          width: MediaQuery.of(context).size.width * 0.83,
                           height: 50,
                           child: ElevatedButton(
                               style: ElevatedButton.styleFrom(

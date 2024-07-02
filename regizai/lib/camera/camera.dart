@@ -1,7 +1,8 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:regizai/model/ss.dart';
+import 'package:regizai/event/event_pref.dart';
+import 'package:regizai/model/response_api.dart';
 import 'package:camera/camera.dart';
 import 'package:regizai/pages/preview.dart';
 import 'package:http/http.dart' as http;
@@ -18,10 +19,20 @@ class Camera extends StatefulWidget {
 class _CameraState extends State<Camera> {
   late CameraController _cameraController;
 
+  late String id;
+
+  void getUser() async {
+    id = (await EventPref.getUser())?.id ?? "";
+    setState(() {
+
+    });
+  }
+
   @override
   void initState() {
     super.initState();
     _initCamera();
+    getUser();
   }
 
   void _initCamera() async {
@@ -47,6 +58,7 @@ class _CameraState extends State<Camera> {
           builder: (context) => PreviewPage(
             picture: picture,
             apiResponse: apiResponse,
+            id: id,
           ),
         ),
       );
@@ -59,7 +71,8 @@ class _CameraState extends State<Camera> {
     try {
       var request = http.MultipartRequest(
         'POST',
-        Uri.parse('http://103.149.71.213/prediksi'),
+        Uri.parse('https://neusisco-scanningspace.hf.space/upload/'),  // For Android emulator
+        // Use 'http://10.0.2.2:8081/upload/' for iOS Simulator or web
       );
 
       request.files.add(await http.MultipartFile.fromPath('file', picture.path));
@@ -75,30 +88,25 @@ class _CameraState extends State<Camera> {
         print('Failed to upload picture. Status code: ${response.statusCode}');
         // Handle the error case if needed
         return ApiResponse(
-          prediction: '',
-          confidence: 0.0,
-          imagePath: '',
-          fileName: '',
-          description: '',
-          pengendalianHayati: '',
-          pengendalianKimiawi: '',
+            brand_name: '',
+            protein: '',
+            fat: '',
+            carbs: '',
+            cal: ''
         );
       }
     } catch (e) {
       print('Error uploading picture: $e');
       // Handle the error case if needed
       return ApiResponse(
-        prediction: '',
-        confidence: 0.0,
-        imagePath: '',
-        fileName: '',
-        description: '',
-        pengendalianHayati: '',
-        pengendalianKimiawi: '',
+          brand_name: '',
+          protein: '',
+          fat: '',
+          carbs: '',
+          cal: ''
       );
     }
   }
-
 
   @override
   void dispose() {
@@ -112,7 +120,7 @@ class _CameraState extends State<Camera> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         centerTitle: true,
-        title: Text('Camera Page', style: TextStyle(color: Color(0xff545454)),),
+        title: Text('Camera Page $id', style: TextStyle(color: Color(0xff545454)),),
         iconTheme: IconThemeData(
             color: Color(0xff545454)
         ),

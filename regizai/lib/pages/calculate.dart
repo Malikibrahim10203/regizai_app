@@ -1,6 +1,8 @@
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:regizai/addon/category.dart';
 import 'package:regizai/api/bmi_service.dart';
 import 'package:wave/wave.dart';
 
@@ -134,6 +136,18 @@ class _CalculateState extends State<Calculate> {
                                 ),
                                 onPressed: () {
                                   _calculateBmi();
+                                  final materialBanner = MaterialBanner(
+                                    /// need to set following properties for best effect of awesome_snackbar_content
+                                    elevation: 0,
+                                    backgroundColor: Colors.transparent,
+                                    forceActionsBelow: true,
+                                    content: Category(_bmiResult),
+                                    actions: const [SizedBox.shrink()],
+                                  );
+
+                                  ScaffoldMessenger.of(context)
+                                    ..hideCurrentMaterialBanner()
+                                    ..showMaterialBanner(materialBanner);
                                 },
                                 child: Text("Calculate", style: TextStyle(color: Colors.white),),
                               ),
@@ -151,10 +165,14 @@ class _CalculateState extends State<Calculate> {
                     border: Border.all(width: 1, color: Colors.black38),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: Padding(
-                    padding: EdgeInsets.all(10),
-                    child: Text("BMI Result: $_bmiResult"),
-                  ),
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.all(10),
+                        child: Text("BMI Result: $_bmiResult"),
+                      ),
+                    ],
+                  )
                 )
               ],
             )

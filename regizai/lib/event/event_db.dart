@@ -7,6 +7,7 @@ import 'package:regizai/login.dart';
 import 'package:regizai/model/catatan_harian.dart';
 import 'package:regizai/model/user.dart';
 import 'package:get/get.dart';
+import 'package:regizai/pages/catatan.dart';
 import 'package:regizai/pages/dashboard.dart';
 import 'package:regizai/pages/profile.dart';
 
@@ -143,6 +144,30 @@ class EventDB {
       print(e);
     }
     return listUser;
+  }
+
+  static Future<User?> saveCatatan(String id, String nama_makanan, String cal) async {
+
+    try {
+      var response = await http.post(Uri.parse(Api.saveCatatan), body: {
+        'id': id,
+        'nama_makanan': nama_makanan,
+        'cal': cal,
+      });
+
+      if (response.statusCode == 200) {
+        Future.delayed(Duration(milliseconds: 1700), () {
+          Get.off(
+            Catatan(id: id,),
+          );
+        });
+      } else {
+
+      }
+
+    } catch (e) {
+      print(e);
+    }
   }
 
 }

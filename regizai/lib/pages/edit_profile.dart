@@ -47,8 +47,8 @@ class _EditProfileState extends State<EditProfile> {
     controllerUsername = TextEditingController(text: userName);
     controllerNewPassword = TextEditingController();
     controllerOldPassword = TextEditingController();
-    controllerWidth    = TextEditingController(text: userWidth);
-    controllerHeight   = TextEditingController(text: userHeight);
+    controllerWidth    = TextEditingController(text: widget.width);
+    controllerHeight   = TextEditingController(text: widget.height);
 
     super.initState();
   }
@@ -155,7 +155,7 @@ class _EditProfileState extends State<EditProfile> {
                       child: TextFormField(
                         controller: controllerHeight,
                         decoration: InputDecoration(
-                            labelText: "Change Height",
+                            labelText: "Height",
                             suffixIcon: Icon(Icons.keyboard_arrow_up_sharp),
                             border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10)

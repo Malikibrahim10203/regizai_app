@@ -1,25 +1,28 @@
-import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:http/http.dart' as http;
 
-class BmiService {
-  static const String _baseUrl = 'https://myfitnesspal2.p.rapidapi.com/searchByKeyword?keyword=oreo';
-  static const String _apiKey = '1a918cc994msh68ae3bd669dbe12p10ad09jsn61c8f959d258';  // Replace with your RapidAPI key
+class MyFitnessPalService {
+  static const String apiUrl = 'https://myfitnesspal2.p.rapidapi.com';
+  static const String apiKey = 'ead0414182mshac3f188039aca36p15e194jsnc0f9137c6639';
 
-  Future<Map<String, dynamic>> calculateBmi(double weight, double height) async {
-    final response = await http.get(
-      Uri.parse('$_baseUrl?weight=$weight&height=$height'),
-      headers: {
-        'Content-Type': 'application/json',
-        'X-RapidAPI-Host': 'myfitnesspal2.p.rapidapi.com',
-        'X-RapidAPI-Key': _apiKey,
-      },
-    );
+  Future<dynamic> fetchNutritionData(String food) async {
+    List nutrition = [];
+    final url = Uri.parse('$apiUrl/searchByKeyword?keyword=$food');
+    final response = await http.get(url, headers: {
+      'X-RapidAPI-Key': apiKey,
+      'X-RapidAPI-Host': 'myfitnesspal2.p.rapidapi.com',
+    });
 
-    if (response.statusCode == 200) {
-      return jsonDecode(response.body);
+    var result = json.decode(response.body);
+    if (food == "ayam goreng") {
+      nutrition = [result[1]['nutritional_contents']['fat'],result[1]['nutritional_contents']['protein'],result[1]['nutritional_contents']['net_carbs']];
     } else {
-      throw Exception('Failed to find Foods');
+      nutrition = [result[0]['nutritional_contents']['fat'],result[0]['nutritional_contents']['protein'],result[0]['nutritional_contents']['net_carbs']];
+    }
+    if (response.statusCode == 200) {
+      return nutrition;
+    } else {
+      throw Exception('Failed to load nutrition data');
     }
   }
 }

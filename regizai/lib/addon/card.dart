@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'package:regizai/api/foods_services.dart';
 
 addonCard(String gambar) {
 
@@ -30,7 +30,7 @@ addonCard(String gambar) {
   );
 }
 
-FoodsPage(String nameFood) {
+FoodsPage(String nameFood, String? fat, String? prot, String? cal) {
   return Column(
     children: [
       ClipRRect(
@@ -94,9 +94,13 @@ FoodsPage(String nameFood) {
           Container(
             width: 120,
             height: 50,
+            padding: EdgeInsets.all(10),
             decoration: BoxDecoration(
               color: Color(0XFFD8CBE2),
             ),
+            child: Column(children: [fat == null
+                ? SizedBox(child: CircularProgressIndicator(), width: 25, height: 25,)
+                : Text("$fat", style: TextStyle(fontSize: 20, color: Colors.white),),],),
           ),
           SizedBox(
             width: 12,
@@ -113,9 +117,13 @@ FoodsPage(String nameFood) {
           Container(
             width: 120,
             height: 50,
+            padding: EdgeInsets.all(10),
             decoration: BoxDecoration(
               color: Color(0XFFD8CBE2),
             ),
+            child: Column(children: [cal == null
+                ? SizedBox(child: CircularProgressIndicator(), width: 25, height: 25,)
+                : Text("$cal", style: TextStyle(fontSize: 20, color: Colors.white),),],),
           ),
         ],
       ),
@@ -136,9 +144,13 @@ FoodsPage(String nameFood) {
           Container(
             width: 120,
             height: 50,
+            padding: EdgeInsets.all(10),
             decoration: BoxDecoration(
               color: Color(0XFFD8CBE2),
             ),
+            child: Column(children: [prot == null
+              ? SizedBox(child: CircularProgressIndicator(), width: 25, height: 25,)
+              : Text("$prot", style: TextStyle(fontSize: 20, color: Colors.white),),],),
           ),
           SizedBox(
             width: 12,

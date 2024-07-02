@@ -24,6 +24,7 @@ class Dashboard extends StatefulWidget {
 class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
 
   late String userName;
+  late String id;
   List<User> listUser = [];
 
   TabController? _controller;
@@ -44,6 +45,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
 
   void getUser() async {
     userName = (await EventPref.getUser())?.name ?? "";
+    id = (await EventPref.getUser())?.id ?? "";
     setState(() {
 
     });
@@ -304,24 +306,18 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                           ],
                         ),
                         SizedBox(
-                          height: 10,
+                          height: 7,
                         ),
                         CarouselSlider(
-                          options: CarouselOptions(height: MediaQuery.of(context).size.height*0.25),
+                          options: CarouselOptions( ),
                           items: ["assets/img/artikel1.png","assets/img/artikel1.png","assets/img/artikel1.png","assets/img/artikel1.png","assets/img/artikel1.png"].map((i) {
                             return Builder(
                               builder: (BuildContext context) {
                                 return Container(
                                     width: MediaQuery.of(context).size.width,
                                     margin: EdgeInsets.symmetric(horizontal: 5.0),
-                                    child: ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                          backgroundColor: Colors.white,
-                                          shape: RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.circular(5)
-                                          )
-                                      ),
-                                      onPressed: () {
+                                    child:  GestureDetector(
+                                      onTap: () {
                                         // Untuk pindH ketika di klik
                                         Navigator.push(context, MaterialPageRoute(builder: (context)=>Artikel()));
                                       },
@@ -330,7 +326,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                                           Image.asset(
                                             "$i",
                                             width: MediaQuery.of(context).size.width*1,
-                                            height: MediaQuery.of(context).size.height*0.2,
+                                            height: MediaQuery.of(context).size.height*0.18,
                                             fit: BoxFit.cover,
                                           ),
                                           SizedBox(
@@ -341,7 +337,20 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                                               Text(
                                                 "Tips diet sehat",
                                                 style: TextStyle(
-                                                    color: Colors.black87
+                                                    fontSize: 17,
+                                                    color:  Colors.black87,
+                                                    fontWeight: FontWeight.bold
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          Row(
+                                            children: [
+                                              Text(
+                                                'Sarapan pagi, Cemilan diet',
+                                                style: TextStyle(
+                                                  color: Colors.black38,
+                                                  fontSize: 12,
                                                 ),
                                               ),
                                             ],
@@ -373,7 +382,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
             controller: _controller,
             tabs: [
               Tab(icon: IconButton(onPressed: (){}, icon: Icon(Icons.home, color: Colors.white,),),),
-              Tab(icon: IconButton(onPressed: (){Navigator.push(context, MaterialPageRoute(builder: (context)=>Catatan()));}, icon: Icon(Icons.note, color: Colors.white,),)),
+              Tab(icon: IconButton(onPressed: (){Navigator.push(context, MaterialPageRoute(builder: (context)=>Catatan(id: id,)));}, icon: Icon(Icons.note, color: Colors.white,),)),
               Tab(icon: IconButton(onPressed: (){}, icon: Icon(Icons.notifications, color: Colors.white,),)),
               Tab(icon: IconButton(onPressed: (){Navigator.push(context, MaterialPageRoute(builder: (context)=>Profile()));}, icon: Icon(Icons.person, color: Colors.white,),))
             ],

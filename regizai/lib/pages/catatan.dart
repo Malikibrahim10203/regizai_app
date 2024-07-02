@@ -4,11 +4,14 @@ import 'package:regizai/pages/dashboard.dart';
 import 'package:regizai/event/event_db.dart';
 import 'package:regizai/event/event_pref.dart';
 import 'package:regizai/model/catatan_harian.dart';
+import 'package:regizai/pages/food.dart';
 import 'package:regizai/pages/profile.dart';
 import 'package:regizai/pages/result.dart';
 
 class Catatan extends StatefulWidget {
-  // const Catatan({super.key, required this.id}));
+  Catatan({Key? key, required this.id}) : super(key: key);
+
+  final id;
 
   @override
   State<Catatan> createState() => _CatatanState();
@@ -18,6 +21,7 @@ class _CatatanState extends State<Catatan> with TickerProviderStateMixin {
 
   List<CatatanModel> listCat = [];
   TabController? _controller;
+
 
   int selectWidget = 1;
   List<Widget> naviWidgets = [
@@ -34,7 +38,7 @@ class _CatatanState extends State<Catatan> with TickerProviderStateMixin {
   }
 
   void getCatatan() async {
-    listCat = await EventDB.getCatatans("1");
+    listCat = await EventDB.getCatatans(widget.id);
     setState(() {
 
     });
@@ -65,9 +69,10 @@ class _CatatanState extends State<Catatan> with TickerProviderStateMixin {
                 itemCount: listCat.length,
                 itemBuilder: (context, index) {
                   CatatanModel catatans = listCat[index];
+                  var name = catatans.namaMakanan.toLowerCase();
                   return GestureDetector(
                     onTap: () {
-                      Navigator.push(context, MaterialPageRoute(builder: (context)=>ResultFood(nameFood: "Bakso")));
+                      Navigator.push(context, MaterialPageRoute(builder: (context)=>Foods(nameFood: name)));
                     },
                     child: Container(
                       width: MediaQuery.of(context).size.width * 0.7,
@@ -80,7 +85,7 @@ class _CatatanState extends State<Catatan> with TickerProviderStateMixin {
                         ),
                         child: ListTile(
                           title: Text("${catatans.namaMakanan}"),
-                          subtitle: Text("${catatans.calories}"),
+                          subtitle: Text("${catatans.cal}"),
                           trailing: Text("${catatans.tglCapture}"),
                         ),
                       ),
