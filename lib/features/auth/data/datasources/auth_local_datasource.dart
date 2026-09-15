@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:regizai/core/error/failures.dart';
+import 'package:regizai/core/errors/failures.dart';
 import 'package:regizai/features/auth/data/models/user_model.dart';
 
 abstract class AuthLocalDataSource {
