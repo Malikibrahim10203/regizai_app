@@ -1,8 +1,11 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'package:regizai/event/event_db.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:regizai/core/theme/app_theme.dart';
+import 'package:regizai/features/journal/presentation/bloc/journal_bloc.dart';
+// import removed
 import 'package:regizai/model/response_api.dart';
-import 'package:regizai/theme/app_theme.dart';
+import 'package:regizai/pages/catatan.dart';
 
 class PreviewPage extends StatelessWidget {
   const PreviewPage({
@@ -34,7 +37,6 @@ class PreviewPage extends StatelessWidget {
         child: ListView(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
           children: [
-            // Food Image Hero Card
             Container(
               height: 220,
               decoration: BoxDecoration(
@@ -94,8 +96,6 @@ class PreviewPage extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 20),
-
-            // Title & Food Name
             Text(
               foodName,
               style: const TextStyle(
@@ -113,8 +113,6 @@ class PreviewPage extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 20),
-
-            // Grid of Nutrition (Calorie, Protein, Fat, Carbs)
             Row(
               children: [
                 Expanded(
@@ -166,44 +164,7 @@ class PreviewPage extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 20),
-
-            // Recommendation Card
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(18),
-                border: Border.all(color: AppColors.border),
-                boxShadow: AppTheme.softShadow,
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: AppColors.primarySurface,
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(Icons.tips_and_updates_rounded, color: AppColors.primary, size: 22),
-                  ),
-                  const SizedBox(width: 14),
-                  const Expanded(
-                    child: Text(
-                      "Porsi makanan ini pas dikonsumsi sebagai bagian dari menu harian seimbang Anda.",
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: AppColors.textSecondary,
-                        height: 1.4,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
             const SizedBox(height: 28),
-
-            // Record to Diary Button
             Container(
               height: 52,
               decoration: BoxDecoration(
@@ -221,7 +182,25 @@ class PreviewPage extends StatelessWidget {
                 ),
                 onPressed: () {
                   final calValue = apiResponse.cal.replaceAll("kcal", "").trim();
-                  EventDB.saveCatatan(id.toString(), foodName, calValue.isEmpty ? "250" : calValue);
+                  context.read<JournalBloc>().add(
+                        AddMealLogEvent(
+                          userId: id.toString(),
+                          namaMakanan: foodName,
+                          cal: calValue.isEmpty ? "250" : calValue,
+                        ),
+                      );
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text("$foodName berhasil dicatat ke jurnal gizi!"),
+                      backgroundColor: AppColors.accentMint,
+                    ),
+                  );
+
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (_) => Catatan(id: id)),
+                  );
                 },
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,

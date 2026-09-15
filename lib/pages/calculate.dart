@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:regizai/mock/offline_service.dart';
-import 'package:regizai/theme/app_theme.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:regizai/core/theme/app_theme.dart';
+import 'package:regizai/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:regizai/features/auth/presentation/bloc/auth_state.dart';
+import 'package:regizai/features/bmi/presentation/cubit/bmi_cubit.dart';
 
 class Calculate extends StatefulWidget {
   const Calculate({Key? key}) : super(key: key);
@@ -13,21 +16,14 @@ class _CalculateState extends State<Calculate> {
   final _weightController = TextEditingController(text: "65");
   final _heightController = TextEditingController(text: "170");
 
-  Map<String, dynamic>? _bmiData;
-
   @override
   void initState() {
     super.initState();
-    _loadInitialUserData();
-  }
-
-  void _loadInitialUserData() async {
-    final user = await OfflineService.getCurrentUser();
-    if (user.width != null && user.width!.isNotEmpty) {
-      _weightController.text = user.width!;
-    }
-    if (user.height != null && user.height!.isNotEmpty) {
-      _heightController.text = user.height!;
+    final authState = context.read<AuthBloc>().state;
+    if (authState is AuthenticatedState) {
+      final user = authState.user;
+      if (user.width.isNotEmpty) _weightController.text = user.width;
+      if (user.height.isNotEmpty) _heightController.text = user.height;
     }
     _computeBmi();
   }
@@ -35,12 +31,8 @@ class _CalculateState extends State<Calculate> {
   void _computeBmi() {
     final w = double.tryParse(_weightController.text) ?? 0.0;
     final h = double.tryParse(_heightController.text) ?? 0.0;
-
     if (w > 0 && h > 0) {
-      final res = OfflineService.calculateBmi(w, h);
-      setState(() {
-        _bmiData = res;
-      });
+      context.read<BmiCubit>().calculate(w, h);
     }
   }
 
@@ -53,14 +45,6 @@ class _CalculateState extends State<Calculate> {
 
   @override
   Widget build(BuildContext context) {
-    final bmiVal = _bmiData?['bmi'] ?? 0.0;
-    final statusText = _bmiData?['status'] ?? "Normal (Ideal)";
-    final colorHex = _bmiData?['color'] ?? 0xFF10B981;
-    final statusColor = Color(colorHex);
-    final adviceText = _bmiData?['advice'] ?? "Pertahankan pola makan seimbang.";
-    final idealMin = _bmiData?['idealMin'] ?? 0.0;
-    final idealMax = _bmiData?['idealMax'] ?? 0.0;
-
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
@@ -74,7 +58,6 @@ class _CalculateState extends State<Calculate> {
         child: ListView(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
           children: [
-            // Top Description
             const Text(
               "Indeks Massa Tubuh (BMI)",
               style: TextStyle(
@@ -93,7 +76,6 @@ class _CalculateState extends State<Calculate> {
             ),
             const SizedBox(height: 20),
 
-            // Input Form Card
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
@@ -103,7 +85,6 @@ class _CalculateState extends State<Calculate> {
               ),
               child: Column(
                 children: [
-                  // Weight Input
                   Row(
                     children: [
                       Expanded(
@@ -140,8 +121,6 @@ class _CalculateState extends State<Calculate> {
                     ],
                   ),
                   const SizedBox(height: 16),
-
-                  // Height Input
                   Row(
                     children: [
                       Expanded(
@@ -178,8 +157,6 @@ class _CalculateState extends State<Calculate> {
                     ],
                   ),
                   const SizedBox(height: 20),
-
-                  // Calculate Button
                   Container(
                     height: 48,
                     width: double.infinity,
@@ -213,132 +190,133 @@ class _CalculateState extends State<Calculate> {
             ),
             const SizedBox(height: 24),
 
-            // BMI Score Display Card
-            if (_bmiData != null) ...[
-              Container(
-                padding: const EdgeInsets.all(24),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(24),
-                  boxShadow: AppTheme.softShadow,
-                  border: Border.all(color: statusColor.withOpacity(0.3), width: 1.5),
-                ),
-                child: Column(
-                  children: [
-                    Text(
-                      "Skor BMI Anda",
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: AppColors.textSecondary,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      "$bmiVal",
-                      style: TextStyle(
-                        fontSize: 52,
-                        fontWeight: FontWeight.w900,
-                        color: statusColor,
-                        letterSpacing: -1,
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: statusColor.withOpacity(0.12),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Text(
-                        statusText,
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          color: statusColor,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
+            BlocBuilder<BmiCubit, BmiState>(
+              builder: (context, state) {
+                if (state is BmiCalculatedState) {
+                  final bmi = state.bmiData;
+                  final statusColor = Color(bmi.colorHex);
 
-                    // Color Scale Visual Bar
-                    Column(
+                  return Container(
+                    padding: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(24),
+                      boxShadow: AppTheme.softShadow,
+                      border: Border.all(color: statusColor.withOpacity(0.3), width: 1.5),
+                    ),
+                    child: Column(
                       children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(8),
-                          child: Row(
-                            children: [
-                              Expanded(child: Container(height: 8, color: const Color(0xFF38BDF8))),
-                              Expanded(child: Container(height: 8, color: const Color(0xFF10B981))),
-                              Expanded(child: Container(height: 8, color: const Color(0xFFF59E0B))),
-                              Expanded(child: Container(height: 8, color: const Color(0xFFEF4444))),
-                            ],
+                        Text(
+                          "Skor BMI Anda",
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: AppColors.textSecondary,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          "${bmi.bmi}",
+                          style: TextStyle(
+                            fontSize: 52,
+                            fontWeight: FontWeight.w900,
+                            color: statusColor,
+                            letterSpacing: -1,
                           ),
                         ),
                         const SizedBox(height: 6),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: const [
-                            Text("< 18.5", style: TextStyle(fontSize: 10, color: AppColors.textMuted)),
-                            Text("18.5 - 24.9", style: TextStyle(fontSize: 10, color: AppColors.textMuted)),
-                            Text("25 - 29.9", style: TextStyle(fontSize: 10, color: AppColors.textMuted)),
-                            Text(">= 30", style: TextStyle(fontSize: 10, color: AppColors.textMuted)),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: statusColor.withOpacity(0.12),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Text(
+                            bmi.status,
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: statusColor,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        Column(
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: Row(
+                                children: [
+                                  Expanded(child: Container(height: 8, color: const Color(0xFF38BDF8))),
+                                  Expanded(child: Container(height: 8, color: const Color(0xFF10B981))),
+                                  Expanded(child: Container(height: 8, color: const Color(0xFFF59E0B))),
+                                  Expanded(child: Container(height: 8, color: const Color(0xFFEF4444))),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 6),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: const [
+                                Text("< 18.5", style: TextStyle(fontSize: 10, color: AppColors.textMuted)),
+                                Text("18.5 - 24.9", style: TextStyle(fontSize: 10, color: AppColors.textMuted)),
+                                Text("25 - 29.9", style: TextStyle(fontSize: 10, color: AppColors.textMuted)),
+                                Text(">= 30", style: TextStyle(fontSize: 10, color: AppColors.textMuted)),
+                              ],
+                            ),
                           ],
+                        ),
+                        const SizedBox(height: 20),
+                        Container(
+                          padding: const EdgeInsets.all(14),
+                          decoration: BoxDecoration(
+                            color: AppColors.background,
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Row(
+                            children: [
+                              const Icon(Icons.health_and_safety_outlined, color: AppColors.primary, size: 24),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text(
+                                      "Kisaran Berat Badan Ideal Anda:",
+                                      style: TextStyle(fontSize: 11, color: AppColors.textSecondary),
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      "${bmi.idealMin} kg - ${bmi.idealMax} kg",
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                        color: AppColors.textPrimary,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 14),
+                        Text(
+                          bmi.advice,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: AppColors.textSecondary,
+                            height: 1.4,
+                          ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 20),
-
-                    // Ideal Weight Recommendation Range
-                    Container(
-                      padding: const EdgeInsets.all(14),
-                      decoration: BoxDecoration(
-                        color: AppColors.background,
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Row(
-                        children: [
-                          const Icon(Icons.health_and_safety_outlined, color: AppColors.primary, size: 24),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text(
-                                  "Kisaran Berat Badan Ideal Anda:",
-                                  style: TextStyle(fontSize: 11, color: AppColors.textSecondary),
-                                ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  "$idealMin kg - $idealMax kg",
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                    color: AppColors.textPrimary,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 14),
-
-                    // Recommendation / Advice
-                    Text(
-                      adviceText,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: AppColors.textSecondary,
-                        height: 1.4,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+                  );
+                }
+                return const SizedBox.shrink();
+              },
+            ),
             const SizedBox(height: 20),
           ],
         ),

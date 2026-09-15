@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:regizai/mock/mock_data.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:regizai/core/theme/app_theme.dart';
+import 'package:regizai/features/food_catalog/domain/entities/food_entity.dart';
+import 'package:regizai/features/food_catalog/presentation/cubit/food_catalog_cubit.dart';
 import 'package:regizai/pages/food.dart';
-import 'package:regizai/theme/app_theme.dart';
 
 class Books extends StatefulWidget {
   const Books({Key? key}) : super(key: key);
@@ -11,8 +13,6 @@ class Books extends StatefulWidget {
 }
 
 class _BooksState extends State<Books> {
-  String _selectedCategory = "Semua";
-  String _searchQuery = "";
   final _searchController = TextEditingController();
 
   final List<String> _categories = [
@@ -29,16 +29,6 @@ class _BooksState extends State<Books> {
     super.dispose();
   }
 
-  List<FoodItem> get _filteredFoods {
-    return MockData.foods.where((item) {
-      final matchesCategory =
-          _selectedCategory == "Semua" || item.category == _selectedCategory;
-      final matchesSearch =
-          item.name.toLowerCase().contains(_searchQuery.toLowerCase());
-      return matchesCategory && matchesSearch;
-    }).toList();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -53,7 +43,6 @@ class _BooksState extends State<Books> {
       body: SafeArea(
         child: Column(
           children: [
-            // Search Bar & Filter Header
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
               child: Container(
@@ -65,17 +54,17 @@ class _BooksState extends State<Books> {
                 child: TextField(
                   controller: _searchController,
                   onChanged: (val) {
-                    setState(() => _searchQuery = val);
+                    context.read<FoodCatalogCubit>().searchFood(val);
                   },
                   decoration: InputDecoration(
                     hintText: "Cari makanan, sayur, buah...",
                     prefixIcon: const Icon(Icons.search_rounded, color: AppColors.primary),
-                    suffixIcon: _searchQuery.isNotEmpty
+                    suffixIcon: _searchController.text.isNotEmpty
                         ? IconButton(
                             icon: const Icon(Icons.clear_rounded, size: 18),
                             onPressed: () {
                               _searchController.clear();
-                              setState(() => _searchQuery = "");
+                              context.read<FoodCatalogCubit>().searchFood("");
                             },
                           )
                         : null,
@@ -88,51 +77,65 @@ class _BooksState extends State<Books> {
               ),
             ),
 
-            // Categories Chips
-            SizedBox(
-              height: 48,
-              child: ListView.separated(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
-                scrollDirection: Axis.horizontal,
-                itemCount: _categories.length,
-                separatorBuilder: (_, __) => const SizedBox(width: 8),
-                itemBuilder: (context, index) {
-                  final cat = _categories[index];
-                  final isSelected = _selectedCategory == cat;
-                  return InkWell(
-                    onTap: () => setState(() => _selectedCategory = cat),
-                    borderRadius: BorderRadius.circular(12),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: isSelected ? AppColors.primary : Colors.white,
+            BlocBuilder<FoodCatalogCubit, FoodCatalogState>(
+              builder: (context, state) {
+                final selectedCat = state is FoodCatalogLoaded ? state.selectedCategory : "Semua";
+
+                return SizedBox(
+                  height: 48,
+                  child: ListView.separated(
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
+                    scrollDirection: Axis.horizontal,
+                    itemCount: _categories.length,
+                    separatorBuilder: (_, __) => const SizedBox(width: 8),
+                    itemBuilder: (context, index) {
+                      final cat = _categories[index];
+                      final isSelected = selectedCat == cat;
+                      return InkWell(
+                        onTap: () {
+                          context.read<FoodCatalogCubit>().filterCategory(cat);
+                        },
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: isSelected ? AppColors.primary : AppColors.border,
-                        ),
-                        boxShadow: isSelected ? AppTheme.coloredShadow : null,
-                      ),
-                      child: Center(
-                        child: Text(
-                          cat,
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                            color: isSelected ? Colors.white : AppColors.textSecondary,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: isSelected ? AppColors.primary : Colors.white,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: isSelected ? AppColors.primary : AppColors.border,
+                            ),
+                            boxShadow: isSelected ? AppTheme.coloredShadow : null,
+                          ),
+                          child: Center(
+                            child: Text(
+                              cat,
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                                color: isSelected ? Colors.white : AppColors.textSecondary,
+                              ),
+                            ),
                           ),
                         ),
-                      ),
-                    ),
-                  );
-                },
-              ),
+                      );
+                    },
+                  ),
+                );
+              },
             ),
             const SizedBox(height: 8),
 
-            // Food Grid
             Expanded(
-              child: _filteredFoods.isEmpty
-                  ? Center(
+              child: BlocBuilder<FoodCatalogCubit, FoodCatalogState>(
+                builder: (context, state) {
+                  if (state is FoodCatalogLoading) {
+                    return const Center(child: CircularProgressIndicator(color: AppColors.primary));
+                  }
+
+                  final foods = state is FoodCatalogLoaded ? state.filteredFoods : [];
+
+                  if (foods.isEmpty) {
+                    return Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: const [
@@ -153,21 +156,25 @@ class _BooksState extends State<Books> {
                           ),
                         ],
                       ),
-                    )
-                  : GridView.builder(
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        childAspectRatio: 0.72,
-                        crossAxisSpacing: 14,
-                        mainAxisSpacing: 14,
-                      ),
-                      itemCount: _filteredFoods.length,
-                      itemBuilder: (context, index) {
-                        final food = _filteredFoods[index];
-                        return _buildFoodGridCard(food);
-                      },
+                    );
+                  }
+
+                  return GridView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      childAspectRatio: 0.72,
+                      crossAxisSpacing: 14,
+                      mainAxisSpacing: 14,
                     ),
+                    itemCount: foods.length,
+                    itemBuilder: (context, index) {
+                      final food = foods[index];
+                      return _buildFoodGridCard(food);
+                    },
+                  );
+                },
+              ),
             ),
           ],
         ),
@@ -175,7 +182,7 @@ class _BooksState extends State<Books> {
     );
   }
 
-  Widget _buildFoodGridCard(FoodItem food) {
+  Widget _buildFoodGridCard(FoodEntity food) {
     return GestureDetector(
       onTap: () {
         Navigator.push(
@@ -193,7 +200,6 @@ class _BooksState extends State<Books> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Image Container
             Expanded(
               child: Container(
                 width: double.infinity,
@@ -218,8 +224,6 @@ class _BooksState extends State<Books> {
                 ),
               ),
             ),
-
-            // Content
             Padding(
               padding: const EdgeInsets.all(12),
               child: Column(
