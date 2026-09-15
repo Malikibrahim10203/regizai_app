@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 
 class AppTheme {
-  // Brand Palette
+  // Brand Palette - Vibrant Health
   static const Color primaryGreen = Color(0xFF10B981);
-  static const Color primaryDark = Color(0xFF047857);
+  static const Color primaryDark = Color(0xFF065F46);
   static const Color primaryLight = Color(0xFFD1FAE5);
+  static const Color primaryExtraLight = Color(0xFFECFDF5);
   static const Color accentGreen = Color(0xFF059669);
 
   static const Color bgSoft = Color(0xFFF8FAFC);
@@ -13,15 +14,23 @@ class AppTheme {
   static const Color textSub = Color(0xFF64748B);
   static const Color borderSubtle = Color(0xFFE2E8F0);
 
-  // Nutritional Macro Colors
-  static const Color calorieColor = Color(0xFFF59E0B); // Amber
-  static const Color carbColor = Color(0xFF3B82F6);    // Blue
-  static const Color proteinColor = Color(0xFF10B981); // Emerald
-  static const Color fatColor = Color(0xFFEF4444);     // Red
+  // Vibrant Nutritional Macro Colors
+  static const Color calorieColor = Color(0xFFF59E0B); // Amber/Orange
+  static const Color carbColor = Color(0xFF3B82F6);    // Electric Blue
+  static const Color proteinColor = Color(0xFF10B981); // Emerald Green
+  static const Color fatColor = Color(0xFFF43F5E);     // Coral / Rose
 
   // Gradients
-  static const LinearGradient heroGradient = LinearGradient(
-    colors: [Color(0xFF059669), Color(0xFF10B981)],
+  static const LinearGradient emeraldHeroGradient = LinearGradient(
+    colors: [Color(0xFF065F46), Color(0xFF059669), Color(0xFF10B981)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  static const LinearGradient heroGradient = emeraldHeroGradient;
+
+  static const LinearGradient calorieRingGradient = LinearGradient(
+    colors: [Color(0xFFF59E0B), Color(0xFF10B981)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
@@ -32,7 +41,7 @@ class AppTheme {
     end: Alignment.bottomCenter,
   );
 
-  // Box Decorations
+  // Modern Bento & Card Decorations
   static BoxDecoration modernCardDecoration({
     Color? color,
     double borderRadius = 20,
@@ -51,6 +60,43 @@ class AppTheme {
               ),
             ]
           : null,
+    );
+  }
+
+  static BoxDecoration bentoCardDecoration({
+    Color? color,
+    double borderRadius = 22,
+    bool isHighlighted = false,
+  }) {
+    return BoxDecoration(
+      color: color ?? cardBg,
+      borderRadius: BorderRadius.circular(borderRadius),
+      border: Border.all(
+        color: isHighlighted ? const Color(0xFFA7F3D0) : const Color(0xFFF1F5F9),
+        width: isHighlighted ? 1.5 : 1,
+      ),
+      boxShadow: [
+        BoxShadow(
+          color: const Color(0x0A0F172A),
+          blurRadius: 18,
+          offset: const Offset(0, 6),
+        ),
+      ],
+    );
+  }
+
+  static BoxDecoration floatingNavDecoration() {
+    return BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(32),
+      border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
+      boxShadow: const [
+        BoxShadow(
+          color: Color(0x18000000),
+          blurRadius: 24,
+          offset: Offset(0, 8),
+        ),
+      ],
     );
   }
 
@@ -83,10 +129,10 @@ class AppTheme {
           foregroundColor: Colors.white,
           elevation: 0,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14),
+            borderRadius: BorderRadius.circular(16),
           ),
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-          textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+          textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
         ),
       ),
     );
