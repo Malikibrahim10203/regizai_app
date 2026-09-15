@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:regizai/addon/card.dart';
+import 'package:regizai/mock/mock_data.dart';
 import 'package:regizai/pages/food.dart';
-import 'package:regizai/pages/result.dart';
+import 'package:regizai/theme/app_theme.dart';
 
 class Books extends StatefulWidget {
   const Books({Key? key}) : super(key: key);
@@ -11,124 +11,280 @@ class Books extends StatefulWidget {
 }
 
 class _BooksState extends State<Books> {
+  String _selectedCategory = "Semua";
+  String _searchQuery = "";
+  final _searchController = TextEditingController();
+
+  final List<String> _categories = [
+    "Semua",
+    "Makanan Berat",
+    "Buah",
+    "Sayuran",
+    "Camilan",
+  ];
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  List<FoodItem> get _filteredFoods {
+    return MockData.foods.where((item) {
+      final matchesCategory =
+          _selectedCategory == "Semua" || item.category == _selectedCategory;
+      final matchesSearch =
+          item.name.toLowerCase().contains(_searchQuery.toLowerCase());
+      return matchesCategory && matchesSearch;
+    }).toList();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: Text("Books"),
-        centerTitle: true,
-        backgroundColor: Color(0xff734597),
+        title: const Text("Katalog Buku Gizi"),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
+          onPressed: () => Navigator.pop(context),
+        ),
       ),
-      body: ListView(
-        children: [
-          Stack(
-            children: [
-              Container(
-                width: MediaQuery.of(context).size.width * 1,
-                height: MediaQuery.of(context).size.height * 1,
+      body: SafeArea(
+        child: Column(
+          children: [
+            // Search Bar & Filter Header
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+              child: Container(
                 decoration: BoxDecoration(
-                  color: Color(0xff734597),
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: AppTheme.softShadow,
+                ),
+                child: TextField(
+                  controller: _searchController,
+                  onChanged: (val) {
+                    setState(() => _searchQuery = val);
+                  },
+                  decoration: InputDecoration(
+                    hintText: "Cari makanan, sayur, buah...",
+                    prefixIcon: const Icon(Icons.search_rounded, color: AppColors.primary),
+                    suffixIcon: _searchQuery.isNotEmpty
+                        ? IconButton(
+                            icon: const Icon(Icons.clear_rounded, size: 18),
+                            onPressed: () {
+                              _searchController.clear();
+                              setState(() => _searchQuery = "");
+                            },
+                          )
+                        : null,
+                    border: InputBorder.none,
+                    enabledBorder: InputBorder.none,
+                    focusedBorder: InputBorder.none,
+                    contentPadding: const EdgeInsets.symmetric(vertical: 14),
+                  ),
                 ),
               ),
-              Positioned(
-                top: 30,
-                child: Container(
-                  width: MediaQuery.of(context).size.width * 1,
-                  height: MediaQuery.of(context).size.height * 1,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.only(topLeft: Radius.circular(40), topRight: Radius.circular(40))
+            ),
+
+            // Categories Chips
+            SizedBox(
+              height: 48,
+              child: ListView.separated(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
+                scrollDirection: Axis.horizontal,
+                itemCount: _categories.length,
+                separatorBuilder: (_, __) => const SizedBox(width: 8),
+                itemBuilder: (context, index) {
+                  final cat = _categories[index];
+                  final isSelected = _selectedCategory == cat;
+                  return InkWell(
+                    onTap: () => setState(() => _selectedCategory = cat),
+                    borderRadius: BorderRadius.circular(12),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: isSelected ? AppColors.primary : Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: isSelected ? AppColors.primary : AppColors.border,
+                        ),
+                        boxShadow: isSelected ? AppTheme.coloredShadow : null,
+                      ),
+                      child: Center(
+                        child: Text(
+                          cat,
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                            color: isSelected ? Colors.white : AppColors.textSecondary,
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+            const SizedBox(height: 8),
+
+            // Food Grid
+            Expanded(
+              child: _filteredFoods.isEmpty
+                  ? Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: const [
+                          Icon(Icons.search_off_rounded, size: 64, color: AppColors.textMuted),
+                          SizedBox(height: 12),
+                          Text(
+                            "Makanan tidak ditemukan",
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.textSecondary,
+                            ),
+                          ),
+                          SizedBox(height: 4),
+                          Text(
+                            "Coba ubah kata kunci atau kategori pencarian Anda.",
+                            style: TextStyle(fontSize: 13, color: AppColors.textMuted),
+                          ),
+                        ],
+                      ),
+                    )
+                  : GridView.builder(
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        childAspectRatio: 0.72,
+                        crossAxisSpacing: 14,
+                        mainAxisSpacing: 14,
+                      ),
+                      itemCount: _filteredFoods.length,
+                      itemBuilder: (context, index) {
+                        final food = _filteredFoods[index];
+                        return _buildFoodGridCard(food);
+                      },
+                    ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFoodGridCard(FoodItem food) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => Foods(nameFood: food.name)),
+        );
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: AppColors.border),
+          boxShadow: AppTheme.softShadow,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Image Container
+            Expanded(
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(12),
+                decoration: const BoxDecoration(
+                  color: AppColors.background,
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(20),
+                    topRight: Radius.circular(20),
                   ),
-                  child: Column(
+                ),
+                child: Center(
+                  child: Image.asset(
+                    food.image,
+                    fit: BoxFit.contain,
+                    errorBuilder: (_, __, ___) => const Icon(
+                      Icons.fastfood_rounded,
+                      size: 40,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+
+            // Content
+            Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    food.category,
+                    style: const TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    food.name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      SizedBox(
-                        height: 20,
-                      ),
-                      Padding(
-                        padding: EdgeInsets.all(3),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            GestureDetector(
-                              onTap: () {
-                                Navigator.push(context, MaterialPageRoute(builder: (context)=>Foods(nameFood: "Bakso")));
-                              },
-                              child: addonCard("bakso"),
-                            ),
-                            GestureDetector(
-                              onTap: () {
-                                Navigator.push(context, MaterialPageRoute(builder: (context)=>Foods(nameFood: "cabai")));
-                              },
-                              child: addonCard("cabai"),
-                            ),
-                            GestureDetector(
-                              onTap: () {
-                                Navigator.push(context, MaterialPageRoute(builder: (context)=>Foods(nameFood: "bika")));
-                              },
-                              child: addonCard("bika"),
-                            ),
-                          ],
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: AppColors.calorieBg,
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                          "${food.calories} kcal",
+                          style: const TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.calorieColor,
+                          ),
                         ),
                       ),
-                      Padding(
-                        padding: EdgeInsets.all(3),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            GestureDetector(
-                              onTap: () {
-                                Navigator.push(context, MaterialPageRoute(builder: (context)=>Foods(nameFood: "bayam")));
-                              },
-                              child: addonCard("bayam"),
-                            ),
-                            GestureDetector(
-                              onTap: () {
-                                Navigator.push(context, MaterialPageRoute(builder: (context)=>Foods(nameFood: "risoles")));
-                              },
-                              child: addonCard("risoles"),
-                            ),
-                            GestureDetector(
-                              onTap: () {
-                                Navigator.push(context, MaterialPageRoute(builder: (context)=>Foods(nameFood: "jeruk")));
-                              },
-                              child: addonCard("jeruk"),
-                            ),
-                          ],
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: AppColors.proteinBg,
+                          borderRadius: BorderRadius.circular(6),
                         ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.all(3),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            GestureDetector(
-                              onTap: () {
-                                Navigator.push(context, MaterialPageRoute(builder: (context)=>Foods(nameFood: "kubis")));
-                              },
-                              child: addonCard("kubis"),
-                            ),
-                            GestureDetector(
-                              onTap: () {
-                                Navigator.push(context, MaterialPageRoute(builder: (context)=>Foods(nameFood: "apel")));
-                              },
-                              child: addonCard("apel"),
-                            ),
-                            GestureDetector(
-                              onTap: () {
-                                Navigator.push(context, MaterialPageRoute(builder: (context)=>Foods(nameFood: "ayam goreng")));
-                              },
-                              child: addonCard("ayam goreng"),
-                            ),
-                          ],
+                        child: Text(
+                          "${food.protein}g P",
+                          style: const TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.proteinColor,
+                          ),
                         ),
                       ),
                     ],
                   ),
-                ),
+                ],
               ),
-            ],
-          )
-        ],
+            ),
+          ],
+        ),
       ),
     );
   }
