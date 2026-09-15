@@ -14,26 +14,24 @@ class ArticleCardWidget extends StatelessWidget {
       onTap: onTap,
       child: Container(
         margin: const EdgeInsets.only(bottom: 14),
-        padding: const EdgeInsets.all(14),
+        padding: const EdgeInsets.all(12),
         decoration: AppTheme.bentoCardDecoration(),
         child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            // Thumbnail Image
+            // Fixed aspect-ratio rounded thumbnail with centered crop
             ClipRRect(
               borderRadius: BorderRadius.circular(16),
-              child: Container(
-                width: 90,
-                height: 90,
-                decoration: const BoxDecoration(
-                  color: AppTheme.primaryLight,
-                ),
+              child: SizedBox(
+                width: 104,
+                height: 84,
                 child: Image.network(
                   article.image,
                   fit: BoxFit.cover,
+                  alignment: Alignment.center,
                   errorBuilder: (_, __, ___) => Container(
                     color: AppTheme.primaryLight,
-                    child: const Icon(Icons.menu_book_rounded, color: AppTheme.primaryGreen, size: 36),
+                    child: const Icon(Icons.menu_book_rounded, color: AppTheme.primaryGreen, size: 32),
                   ),
                 ),
               ),
@@ -43,8 +41,8 @@ class ArticleCardWidget extends StatelessWidget {
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Category & Reading Time
                   Row(
                     children: [
                       Container(
@@ -66,12 +64,11 @@ class ArticleCardWidget extends StatelessWidget {
                       const SizedBox(width: 6),
                       Text(
                         '⏱️ ${article.readTime.isNotEmpty ? article.readTime : "5 mnt"}',
-                        style: const TextStyle(fontSize: 10, color: AppTheme.textSub, fontWeight: FontWeight.w500),
+                        style: const TextStyle(fontSize: 10, color: AppTheme.textSub, fontWeight: FontWeight.w600),
                       ),
                     ],
                   ),
                   const SizedBox(height: 6),
-                  // Title
                   Text(
                     article.title,
                     style: const TextStyle(
@@ -85,16 +82,17 @@ class ArticleCardWidget extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 4),
-                  // Snippet
                   Text(
                     article.subtitle.isNotEmpty ? article.subtitle : article.content,
-                    maxLines: 2,
+                    maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontSize: 11, color: AppTheme.textSub, height: 1.4),
+                    style: const TextStyle(fontSize: 11, color: AppTheme.textSub),
                   ),
                 ],
               ),
             ),
+            const SizedBox(width: 6),
+            const Icon(Icons.chevron_right_rounded, color: AppTheme.textSub, size: 20),
           ],
         ),
       ),

@@ -20,6 +20,7 @@ class _ArticlesPageState extends State<ArticlesPage> {
     'Semua',
     'Pola Makan',
     'Tips Diet',
+    'Hidrasi',
     'Makronutrien',
     'Resep Sehat',
   ];
@@ -180,15 +181,16 @@ class _HeroFeaturedArticleCard extends StatelessWidget {
               children: [
                 ClipRRect(
                   borderRadius: const BorderRadius.vertical(top: Radius.circular(22)),
-                  child: Image.network(
-                    article.image,
-                    height: 180,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => Container(
-                      height: 180,
-                      color: AppTheme.primaryLight,
-                      child: const Icon(Icons.menu_book_rounded, size: 60, color: AppTheme.primaryGreen),
+                  child: AspectRatio(
+                    aspectRatio: 16 / 9,
+                    child: Image.network(
+                      article.image,
+                      fit: BoxFit.cover,
+                      alignment: Alignment.center,
+                      errorBuilder: (_, __, ___) => Container(
+                        color: AppTheme.primaryLight,
+                        child: const Icon(Icons.menu_book_rounded, size: 60, color: AppTheme.primaryGreen),
+                      ),
                     ),
                   ),
                 ),

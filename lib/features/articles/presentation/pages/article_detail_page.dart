@@ -27,24 +27,26 @@ class _ArticleDetailPageState extends State<ArticleDetailPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Hero Image with rounded bottom & gradient overlay
+                // Proportional Hero Image with 16:10 aspect ratio
                 Stack(
                   children: [
-                    Container(
-                      height: 300,
-                      width: double.infinity,
-                      decoration: const BoxDecoration(
-                        color: AppTheme.primaryLight,
-                        borderRadius: BorderRadius.vertical(bottom: Radius.circular(32)),
-                      ),
-                      child: ClipRRect(
-                        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(32)),
-                        child: Image.network(
-                          a.image,
-                          fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) => Container(
-                            color: AppTheme.primaryLight,
-                            child: const Icon(Icons.menu_book_rounded, size: 80, color: AppTheme.primaryGreen),
+                    AspectRatio(
+                      aspectRatio: 16 / 10,
+                      child: Container(
+                        decoration: const BoxDecoration(
+                          color: AppTheme.primaryLight,
+                          borderRadius: BorderRadius.vertical(bottom: Radius.circular(32)),
+                        ),
+                        child: ClipRRect(
+                          borderRadius: const BorderRadius.vertical(bottom: Radius.circular(32)),
+                          child: Image.network(
+                            a.image,
+                            fit: BoxFit.cover,
+                            alignment: Alignment.center,
+                            errorBuilder: (_, __, ___) => Container(
+                              color: AppTheme.primaryLight,
+                              child: const Icon(Icons.menu_book_rounded, size: 80, color: AppTheme.primaryGreen),
+                            ),
                           ),
                         ),
                       ),
