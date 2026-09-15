@@ -14,7 +14,9 @@ import 'package:regizai/features/ai_scanner/presentation/pages/camera_scanner_pa
 import 'package:regizai/features/ai_scanner/presentation/pages/scan_preview_page.dart';
 import 'package:regizai/features/bmi/presentation/pages/bmi_calculator_page.dart';
 import 'package:regizai/features/bmi/presentation/pages/bmi_result_page.dart';
+import 'package:regizai/features/articles/domain/entities/article_entity.dart';
 import 'package:regizai/features/articles/presentation/pages/articles_page.dart';
+import 'package:regizai/features/articles/presentation/pages/article_detail_page.dart';
 
 class AppRoutes {
   static const String initial = '/';
@@ -32,6 +34,7 @@ class AppRoutes {
   static const String bmiCalculator = '/bmi-calculator';
   static const String bmiResult = '/bmi-result';
   static const String articles = '/articles';
+  static const String articleDetail = '/article-detail';
   static const String profile = '/profile';
   static const String editProfile = '/edit-profile';
 
@@ -83,6 +86,12 @@ class AppRoutes {
           ),
         );
       case articles:
+        return MaterialPageRoute(builder: (_) => const ArticlesPage());
+      case articleDetail:
+        final article = settings.arguments as ArticleEntity?;
+        if (article != null) {
+          return MaterialPageRoute(builder: (_) => ArticleDetailPage(article: article));
+        }
         return MaterialPageRoute(builder: (_) => const ArticlesPage());
       case profile:
         return MaterialPageRoute(builder: (_) => const ProfilePage());
