@@ -14,17 +14,27 @@ class FoodRepositoryImpl implements FoodRepository {
 
   @override
   Future<List<FoodEntity>> getFoods() async {
-    // Default catalog starts with curated healthy foods
+    // 1. Fetch live curated recommendations from FatSecret when credentials are valid
+    if (fatSecretDataSource.hasValidCredentials) {
+      try {
+        final remoteFoods = await fatSecretDataSource.searchFoods('salad');
+        if (remoteFoods.isNotEmpty) {
+          return remoteFoods;
+        }
+      } catch (_) {}
+    }
+
+    // 2. Fallback to curated healthy foods if offline
     return await mockDataSource.getFoods();
   }
 
   @override
   Future<List<FoodEntity>> searchFoods(String query) async {
     if (query.trim().isEmpty) {
-      return await mockDataSource.getFoods();
+      return await getFoods();
     }
 
-    // Try online FatSecret API first if credentials are configured
+    // Try online FatSecret API first
     if (fatSecretDataSource.hasValidCredentials) {
       try {
         final remoteFoods = await fatSecretDataSource.searchFoods(query);

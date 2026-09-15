@@ -6,10 +6,13 @@ class FoodItemCard extends StatelessWidget {
   final FoodEntity food;
   final VoidCallback onTap;
 
-  const FoodItemCard({Key? key, required this.food, required this.onTap}) : super(key: key);
+  const FoodItemCard({super.key, required this.food, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
+    final bool isFatSecret =
+        food.description.contains('FatSecret') || food.vitamins.contains('FatSecret');
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -38,9 +41,47 @@ class FoodItemCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(food.name, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppTheme.textMain)),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          food.name,
+                          style: const TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                            color: AppTheme.textMain,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      if (isFatSecret)
+                        Container(
+                          margin: const EdgeInsets.only(left: 6),
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFE8F5E9),
+                            borderRadius: BorderRadius.circular(4),
+                            border: Border.all(color: const Color(0xFFA5D6A7)),
+                          ),
+                          child: const Text(
+                            'FatSecret',
+                            style: TextStyle(
+                              color: Color(0xFF2E7D32),
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
                   const SizedBox(height: 4),
-                  Text('${food.calories} kkal • ${food.category}', style: const TextStyle(fontSize: 13, color: AppTheme.textSub)),
+                  Text(
+                    '${food.calories} kkal • ${food.portion.isNotEmpty ? food.portion : food.category}',
+                    style: const TextStyle(fontSize: 12, color: AppTheme.textSub),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ],
               ),
             ),
