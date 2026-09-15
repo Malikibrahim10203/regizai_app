@@ -22,6 +22,7 @@ import 'package:regizai/features/journal/presentation/bloc/journal_bloc.dart';
 
 // Food Catalog
 import 'package:regizai/features/food_catalog/data/datasources/food_mock_datasource.dart';
+import 'package:regizai/features/food_catalog/data/datasources/fatsecret_remote_datasource.dart';
 import 'package:regizai/features/food_catalog/data/repositories/food_repository_impl.dart';
 import 'package:regizai/features/food_catalog/domain/repositories/food_repository.dart';
 import 'package:regizai/features/food_catalog/domain/usecases/get_foods_usecase.dart';
@@ -97,8 +98,14 @@ Future<void> init() async {
 
   //! Food Catalog Feature
   sl.registerLazySingleton<FoodMockDataSource>(() => FoodMockDataSourceImpl());
+  sl.registerLazySingleton<FatSecretRemoteDataSource>(
+    () => FatSecretRemoteDataSourceImpl(),
+  );
   sl.registerLazySingleton<FoodRepository>(
-    () => FoodRepositoryImpl(sl()),
+    () => FoodRepositoryImpl(
+      mockDataSource: sl(),
+      fatSecretDataSource: sl(),
+    ),
   );
   sl.registerLazySingleton(() => GetFoodsUseCase(sl()));
   sl.registerFactory(() => FoodCatalogCubit(sl()));
